@@ -1,5 +1,5 @@
-# rkprobes
-`rkprobes` helps you dynamically probe one or more functions and instructions in kernel
+# ruprobes
+`ruprobes` is a modularized version of `uprobe` from [rCore-ebpf](https://github.com/hm1229/rCore-ebpf). It helps you dynamically probe one or more functions and instructions in user space.
 
 
 
@@ -71,18 +71,11 @@ pub fn kprobes_trap_handler(cx: &mut TrapFrame);
 
   
 
-
+### How to Port to Other OSs
+DFS
 
 ### ToDo List
 
 - [ ] divide `Func` type into `basic_func` and `async_fun`
 - [ ] can get the parameters during parameter passing
-
-
-
-
-
-author：hm
-
-mentor：Xia Zhao, Yong Xiang
 
