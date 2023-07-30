@@ -1,19 +1,28 @@
-use alloc::boxed::Box;
-use alloc::collections::btree_map::BTreeMap;
-use alloc::string::String;
-use core::cell::RefCell;
-use spin::Mutex;
-use alloc::sync::Arc;
-use alloc::vec::Vec;
+// use alloc::boxed::Box;
+// use alloc::collections::btree_map::BTreeMap;
+// use alloc::string::String;
+// use core::cell::RefCell;
+// use spin::Mutex;
+// use alloc::sync::Arc;
+// use alloc::vec::Vec;
 use core::convert::TryInto;
-use core::slice::{from_raw_parts, from_raw_parts_mut};
-use riscv_insn_decode::get_insn_length;
-use trapframe::UserContext;
-use super::kprobes::kprobe_register;
-use super::uprobes::uprobe_register;
+use core::slice::from_raw_parts;
+use crate::os_copy_from_user;
+//, from_raw_parts_mut};
+use crate::riscv_insn_decode::get_insn_length;
+//use trapframe::UserContext;
+//use super::kprobes::kprobe_register;
+//use super::uprobes::uprobe_register;
 
-pub fn get_sp(addr: usize) -> Option<usize>{
-    let slot = unsafe { from_raw_parts(addr as *const u8, 4) };
+pub unsafe fn get_sp(addr: usize) -> Option<usize>{
+
+
+    let mut slot_copy:[u8;4] = [0,0,0,0];
+    os_copy_from_user(addr, &mut (slot_copy[0]), 4);
+    let slot = &slot_copy;
+
+
+    //let slot: &[u8] = unsafe { from_raw_parts(addr as *const u8, 4) };
     let mut addisp: usize= 0;
     match get_insn_length(addr) {
         4 => {

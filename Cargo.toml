@@ -10,8 +10,10 @@ edition = "2018"
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 log = "0.4"
 spin = "0.5"
-trapframe = { git = "https://github.com/rcore-os/trapframe-rs", rev = "bdfe5aa" }
+# trapframe = { git = "https://github.com/rcore-os/trapframe-rs", rev = "bdfe5aa" }
+trapframe = { git = "https://github.com/rcore-os/trapframe-rs"}
 riscv-decode = "0.2.0"
+trap_context_riscv = { git = "https://github.com/chenzhiy2001/trap_context_riscv"}
 
 [features] # Open only one
 rCore-Plus = []

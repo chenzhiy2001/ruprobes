@@ -1,5 +1,27 @@
 use riscv_decode::{decode, Instruction, instruction_length};
 
+use crate::os_copy_from_user;
+
+// extern "C" {
+//     fn os_copy_from_user(usr_addr: usize, kern_buf: *mut u8, len: usize) -> i32;
+//     fn os_copy_to_user(usr_addr: usize, kern_buf: *const u8, len: usize) -> i32;
+// }
+
+
+/// be careful about endianess
+fn arr_to_u32_as_it_is(array: &[u8; 4]) -> u32 {
+    ((array[0] as u32) << 24) +
+    ((array[1] as u32) << 16) +
+    ((array[2] as u32) <<  8) +
+    ((array[3] as u32) <<  0)
+}
+
+/// be careful about endianess
+fn arr_to_u16_as_it_is(array: &[u8; 2]) -> u16 {
+    ((array[0] as u16) << 8) +
+    ((array[1] as u16) << 0) 
+}
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(u8)]
 pub enum Opcode {
@@ -47,10 +69,17 @@ pub enum InsnStatus {
     Legal,
 }
 
-pub fn insn_decode(addr: usize) -> InsnStatus{
-    let addr_32 = unsafe{core::slice::from_raw_parts(addr as *const u32, 1)};
+pub unsafe fn insn_decode(addr: usize) -> InsnStatus{
+    //IF YOU CHANGE ENDIAN OF THE MACHINE, THE FOLLOWING CODE SHOULD BE CHANGED.
+    let mut addr_32bit_array:[u8;4]=[0,0,0,0];
+    os_copy_from_user(addr, &mut(addr_32bit_array[0]), 32/8);//czy MIGHT BE PROBLEMATIC DUE TO ENDIAN AND ALIGNMENT
+    let addr_32:[u32;1]=[arr_to_u32_as_it_is(&addr_32bit_array)];
+    //let addr_32 = unsafe{core::slice::from_raw_parts(addr as *const u32, 1)}; 
     if addr_32[0] & 0b11 != 0b11{
-        let addr_16 = unsafe{core::slice::from_raw_parts(addr as *const u16, 1)};
+        let mut addr_16bit_array:[u8;2]=[0,0];
+        os_copy_from_user(addr, &mut(addr_16bit_array[0]), 16/8);//czy MIGHT BE PROBLEMATIC DUE TO ENDIAN AND ALIGNMENT
+        let addr_16:[u16;1]=[arr_to_u16_as_it_is(&addr_16bit_array)];
+        //let addr_16 = unsafe{core::slice::from_raw_parts(addr as *const u16, 1)};
         match c_decode(addr_16[0]){
             Opcode::CJ => return InsnStatus::Illegal,
             Opcode::CJR => return InsnStatus::Illegal,
@@ -161,6 +190,12 @@ pub fn c_decode(base: u16) -> Opcode {
 }
 
 pub fn get_insn_length(addr: usize) -> usize{
-    let addr = unsafe{core::slice::from_raw_parts(addr as *const u16, 1)};
+    let mut buffer:[u8;2] = [0,0];
+    let buffer_pointer = &mut buffer[0];
+    unsafe {
+        crate::os_copy_from_user(addr, buffer_pointer, 2);
+    }
+    //let addr = unsafe{core::slice::from_raw_parts(addr as *const u16, 1)};
+    let addr = unsafe{core::slice::from_raw_parts(&buffer as *const u8 as *const u16, 1)};
     instruction_length(addr[0])
 }
