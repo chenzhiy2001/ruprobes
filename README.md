@@ -1,8 +1,7 @@
 # ruprobes
 `ruprobes` is a modularized version of `uprobe` originated from [rCore-ebpf](https://github.com/hm1229/rCore-ebpf) which currently runs on [rCore-Tutorialv3](https://github.com/rcore-os/rCore-Tutorial-v3). It helps you dynamically probe one or more functions and instructions in user space.
 
-The crate aims to be modular as possible. If your OS has sufficient eBPF codes, you only need to write a handler and 2 function calls in your OS. See [registering-uprobes](#registering-uprobes) and [uprobes-init-and-handling](#uprobes-init-and-handling)
-1. 
+The crate aims to be modular as possible. If your OS has sufficient eBPF codes, you only need to write a handler and 2 function calls in your OS. See [registering-uprobes](#registering-uprobes) and [uprobes-init-and-handling](#uprobes-init-and-handling).
 
 ## Usage
 The following describes how you can use this crate in your OS for uprobe functionalities. All example code comes from [this commit](https://github.com/chenzhiy2001/rcore-ebpf/commit/108e81bab6d83c445ca9d70fdc5be55f588b5f21).
