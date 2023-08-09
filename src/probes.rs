@@ -31,9 +31,9 @@ pub unsafe fn get_sp(addr: usize) -> Option<usize>{
             if inst & 0b00000000000011111111111111111111 == 0b00000000000000010000000100010011 {
                 // addi sp, sp, imm
                 addisp = sext(((inst >> 20) & 0b111111111111) as isize, 12) as usize;
-                debug!("kprobes: hook on addi sp, sp, {}", addisp);
+                debug!("uprobes: hook on addi sp, sp, {}", addisp);
             } else {
-                warn!("kprobes: target instruction is not addi sp, sp, imm");
+                warn!("uprobes: target instruction is not addi sp, sp, imm");
                 return None;
             }
         }
@@ -50,14 +50,14 @@ pub unsafe fn get_sp(addr: usize) -> Option<usize>{
                         + (((inst >> 2) & 0b1) << 5)) as isize,
                     10,
                 ) as usize;
-                debug!("kprobes: hook on c.addi16sp {}", addisp as isize);
+                debug!("uprobes: hook on c.addi16sp {}", addisp as isize);
             } else if inst & 0b1110111110000011 == 0b0000000100000001 {
                 // c.addi sp, imm
                 addisp = sext(
                     ((((inst >> 12) & 0b1) << 5) + (((inst >> 2) & 0b11111) << 0)) as isize,
                     6,
                 ) as usize;
-                debug!("kprobes: hook on c.addi sp, {}", addisp as isize);
+                debug!("uprobes: hook on c.addi sp, {}", addisp as isize);
             } else if  inst & 0b1110000000000011 == 0 {
                 // c.addi4spn
                 addisp = sext(((((inst >> 11) & 0b111) << 3)
@@ -68,7 +68,7 @@ pub unsafe fn get_sp(addr: usize) -> Option<usize>{
                 ) as usize;
                 // println!("kprobes: hook on c.addi4spn, {}", addisp);
             } else {
-                error!("kprobes: target instruction is not c.addi sp, imm or c.addi16sp imm or c.addi4spn imm");
+                error!("uprobes: target instruction is not c.addi sp, imm or c.addi16sp imm or c.addi4spn imm");
                 return None;
             }
         }
