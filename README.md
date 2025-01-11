@@ -1,5 +1,5 @@
 # ruprobes
-`ruprobes` is a modularized version of `uprobe` originated from [rCore-ebpf](https://github.com/hm1229/rCore-ebpf) which currently runs on [rCore-Tutorialv3](https://github.com/rcore-os/rCore-Tutorial-v3). It helps you dynamically probe one or more functions and instructions in user space.
+`ruprobes` is a modularized version of `uprobe` originated from [rCore-ebpf](https://github.com/hm1229/rCore-ebpf) which currently runs on [rCore-Tutorial-v3](https://github.com/rcore-os/rCore-Tutorial-v3). It helps you dynamically probe one or more functions and instructions in user space.
 
 The crate aims to be modular as possible. If your OS has sufficient eBPF codes, you only need to write a handler and 2 function calls in your OS. See [registering-uprobes](#registering-uprobes) and [uprobes-init-and-handling](#uprobes-init-and-handling).
 
@@ -27,7 +27,7 @@ pub extern "C" fn os_copy_from_user(usr_addr: usize, kern_buf: *mut u8, len: usi
 #[no_mangle]
 pub extern "C" fn os_copy_to_user(usr_addr: usize, kern_buf: *const u8, len: usize) -> i32;
 ```
-Their implementations differ in different OSes due to different page table design. For example, in [rCore-ebpf](https://github.com/hm1229/rCore-ebpf), the kernel can read/write user virtual address *directly* because it costs only one pagetable for a process and its kernel space, while in [rCore-Tutorialv3](https://github.com/rcore-os/rCore-Tutorial-v3), a so-called dual-pagetable design (which means that the processes and kernel use different pagetables) is being used, which makes reading and writing user addresses complicated because you'll have to do more page pable manipulations.
+Their implementations differ in different OSes due to different page table design. For example, in [rCore-ebpf](https://github.com/hm1229/rCore-ebpf), the kernel can read/write user virtual address *directly* because it costs only one pagetable for a process and its kernel space, while in [rCore-Tutorial-v3](https://github.com/rcore-os/rCore-Tutorial-v3), a so-called dual-pagetable design (which means that the processes and kernel use different pagetables) is being used, which makes reading and writing user addresses complicated because you'll have to do more page pable manipulations.
 
 The use of `#[no_mangle]` and `extern "C"` syntaxes makes sure that ruprobes can use those functions you have provided.
 
